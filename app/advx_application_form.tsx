@@ -1,5 +1,3 @@
-// "use client";
-
 import { useState } from "react";
 import { FaUser, FaEnvelope, FaCalendarAlt, FaGithub } from "react-icons/fa";
 import {
@@ -75,9 +73,7 @@ export default function AdvxApplicationForm() {
           name="email"
           value={data.email}
           onChange={(e) => {
-            if (e.target.checkValidity()) {
-              setData({ ...data, email: e.target.value });
-            }
+            setData({ ...data, email: e.target.value });
           }}
           onBlur={async (e) => {
             send_email(e.target.value);
