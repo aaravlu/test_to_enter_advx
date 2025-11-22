@@ -34,9 +34,9 @@ export default function AdvxApplicationForm() {
         send_all(data);
       }}
     >
-      <div style={{ display: "flex", alignItems: "center" }}>
-        <label style={{ display: "flex", alignItems: "center" }}>
-          <FaGithub style={{ marginRight: "16px" }} /> Github ID:
+      <div className="flex items-center mb-4">
+        <label className="flex items-center">
+          <FaGithub className="mr-4" /> Github ID:
         </label>
         <input
           type="text"
@@ -47,11 +47,12 @@ export default function AdvxApplicationForm() {
           }}
           onBlur={async (e) => send_github_id(e.target.value)}
           required
+          className="ml-2"
         />
       </div>
-      <div style={{ display: "flex", alignItems: "center" }}>
-        <label style={{ display: "flex", alignItems: "center" }}>
-          <FaUser style={{ marginRight: "16px" }} /> Name:
+      <div className="flex items-center mb-4">
+        <label className="flex items-center">
+          <FaUser className="mr-4" /> Name:
         </label>
         <input
           type="text"
@@ -62,11 +63,12 @@ export default function AdvxApplicationForm() {
           }}
           onBlur={async (e) => send_name(e.target.value)}
           required
+          className="ml-2"
         />
       </div>
-      <div style={{ display: "flex", alignItems: "center" }}>
-        <label style={{ display: "flex", alignItems: "center" }}>
-          <FaEnvelope style={{ marginRight: "16px" }} /> Email:
+      <div className="flex items-center mb-4">
+        <label className="flex items-center">
+          <FaEnvelope className="mr-4" /> Email:
         </label>
         <input
           type="email"
@@ -79,11 +81,12 @@ export default function AdvxApplicationForm() {
             send_email(e.target.value);
           }}
           required
+          className="ml-2"
         />
       </div>
-      <div style={{ display: "flex", alignItems: "center" }}>
-        <label style={{ display: "flex", alignItems: "center" }}>
-          <FaCalendarAlt style={{ marginRight: "16px" }} /> Age:
+      <div className="flex items-center mb-4">
+        <label className="flex items-center">
+          <FaCalendarAlt className="mr-4" /> Age:
         </label>
         {/*its length should from 10 to 60, which is length is 51*/}
         <select
@@ -95,6 +98,7 @@ export default function AdvxApplicationForm() {
             })
           }
           onBlur={async (e) => send_age(parseInt(e.target.value))}
+          className="ml-2"
         >
           <option value="">Select Age</option>
           {Array.from({ length: 51 }, (_, i) => i + 10).map((age) => (
@@ -104,8 +108,13 @@ export default function AdvxApplicationForm() {
           ))}
         </select>
       </div>
-      <div>
-        <button type="submit">Submit</button>
+      <div className="mt-6">
+        <button
+          type="submit"
+          className="px-4 py-2 bg-gray-600 text-gray-200 rounded hover:bg-blue-400"
+        >
+          Submit
+        </button>
       </div>
     </form>
   );
