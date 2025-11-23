@@ -38,12 +38,12 @@ export async function POST(request: Request) {
     try {
       await fs.writeFile(filePath, JSON.stringify(mergedData, null, 2));
     } catch (error) {
-      console.error("Error when writing:", error);
+      return NextResponse.json({ error: "Fail to save file" }, { status: 500 });
+      // console.error("Error when writing:", error);
     }
 
     return NextResponse.json({ success: true });
   } catch (error) {
-    console.error(error);
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 },
