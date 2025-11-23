@@ -1,9 +1,9 @@
 import fs from "fs/promises";
 import path from "path";
-import { AdvxData } from "../../types/advx";
+import { AdvxData } from "@/types/advx";
 
 export default async function AllSubmittedData() {
-  const dataDir = path.join(process.cwd(), "data");
+  const dataDir = path.join(process.cwd(), "/tmp");
   const files = await fs.readdir(dataDir);
   const jsonFiles = files.filter((file) => file.endsWith(".json"));
 

@@ -14,7 +14,7 @@ export async function POST(request: Request) {
       );
     }
 
-    const filePath = path.join(process.cwd(), "data", `${github_id}.json`);
+    const filePath = path.join(process.cwd(), "/tmp", `${github_id}.json`);
 
     let existingData = {};
     try {
