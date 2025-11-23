@@ -20,11 +20,15 @@ export default function FormComponent() {
     const github_id = values.github_id;
 
     if (field !== "github_id") {
-      await fetch("/post", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ github_id, [field]: values[field] }),
-      });
+      try {
+        await fetch("/post", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ github_id, [field]: values[field] }),
+        });
+      } catch (error) {
+        console.error(error);
+      }
     }
   };
 
