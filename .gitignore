@@ -48,3 +48,4 @@ prompt_*
 
 # local data
 data/*
+!data/.gitkeep
