@@ -1,15 +1,6 @@
 import { NextResponse } from "next/server";
-import path from "path";
-import fs from "fs/promises";
-
-async function exists(path: string) {
-  try {
-    await fs.access(path);
-    return true;
-  } catch {
-    return false;
-  }
-}
+import { dataStore } from "@/lib/data_store";
+import { AdvxData } from "@/types/advx";
 
 export async function POST(request: Request) {
   try {
@@ -22,24 +13,11 @@ export async function POST(request: Request) {
         { status: 400 },
       );
     }
-    const filePath = path.join("/tmp", `${github_id}.json`);
 
-    let existingData = {};
-
-    if (await exists(filePath)) {
-      console.log("File exists, pasring data.");
-      existingData = JSON.parse(await fs.readFile(filePath, "utf-8"));
-    } else {
-      console.log("File does not exist, creating new one.");
-    }
-
+    const existingData = dataStore.get(github_id) || {};
     const mergedData = { ...existingData, github_id, ...fields };
 
-    try {
-      await fs.writeFile(filePath, JSON.stringify(mergedData, null, 2));
-    } catch {
-      return NextResponse.json({ error: "Fail to save file" }, { status: 500 });
-    }
+    dataStore.set(github_id, mergedData as AdvxData);
 
     return NextResponse.json({ success: true });
   } catch {

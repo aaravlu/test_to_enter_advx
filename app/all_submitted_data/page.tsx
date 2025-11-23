@@ -1,25 +1,9 @@
-import fs from "fs/promises";
-import path from "path";
-import { AdvxData } from "@/types/advx";
+import { dataStore } from "@/lib/data_store";
 
 export const dynamic = "force-dynamic";
 
 export default async function AllSubmittedData() {
-  const dataDir = "/tmp";
-  const files = await fs.readdir(dataDir);
-  const jsonFiles = files.filter((file) => file.endsWith(".json"));
-
-  const dataList: AdvxData[] = [];
-  for (const file of jsonFiles) {
-    try {
-      const filePath = path.join(dataDir, file);
-      const content = await fs.readFile(filePath, "utf-8");
-      const data = JSON.parse(content) as AdvxData;
-      dataList.push(data);
-    } catch (error) {
-      console.error(`Error reading ${file}:`, error);
-    }
-  }
+  const dataList = Array.from(dataStore.values());
 
   return (
     <div className="max-w-4xl mx-auto p-4">
