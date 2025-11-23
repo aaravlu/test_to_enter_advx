@@ -27,12 +27,19 @@ export async function POST(request: Request) {
     let existingData = {};
 
     if (await exists(filePath)) {
+      console.log("File exists, pasring data.");
       existingData = JSON.parse(await fs.readFile(filePath, "utf-8"));
+    } else {
+      console.log("File does not exist, creating new one.");
     }
 
     const mergedData = { ...existingData, github_id, ...fields };
 
-    await fs.writeFile(filePath, JSON.stringify(mergedData, null, 2));
+    try {
+      await fs.writeFile(filePath, JSON.stringify(mergedData, null, 2));
+    } catch (error) {
+      console.error("Error when writing:", error);
+    }
 
     return NextResponse.json({ success: true });
   } catch (error) {
