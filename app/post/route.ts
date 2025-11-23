@@ -1,6 +1,15 @@
 import { NextResponse } from "next/server";
-import fs from "fs/promises";
 import path from "path";
+import fs from "fs/promises";
+
+async function exists(path: string) {
+  try {
+    await fs.access(path);
+    return true;
+  } catch {
+    return false;
+  }
+}
 
 export async function POST(request: Request) {
   try {
@@ -13,16 +22,12 @@ export async function POST(request: Request) {
         { status: 400 },
       );
     }
-
-    // const filePath = path.join(process.cwd(), "/tmp", `${github_id}.json`);
     const filePath = path.join("/tmp", `${github_id}.json`);
 
     let existingData = {};
-    try {
-      const fileContent = await fs.readFile(filePath, "utf-8");
-      existingData = JSON.parse(fileContent);
-    } catch (error) {
-      console.error("Error reading existing file:", error);
+
+    if (await exists(filePath)) {
+      existingData = JSON.parse(await fs.readFile(filePath, "utf-8"));
     }
 
     const mergedData = { ...existingData, github_id, ...fields };
