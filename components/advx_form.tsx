@@ -35,9 +35,12 @@ export default function FormComponent() {
   return (
     <form className="space-y-4">
       <div>
-        <label className="block text-sm font-medium">GitHub ID</label>
+        <label htmlFor="github_id" className="block text-sm font-medium">
+          GitHub ID
+        </label>
         <input
           {...register("github_id")}
+          id="github_id"
           type="text"
           className="w-full p-2 border rounded"
           onBlur={() => handleBlur("github_id")}
@@ -48,9 +51,12 @@ export default function FormComponent() {
         )}
       </div>
       <div>
-        <label className="block text-sm font-medium">Email</label>
+        <label htmlFor="email" className="block text-sm font-medium">
+          Email
+        </label>
         <input
           {...register("email")}
+          id="email"
           type="email"
           className="w-full p-2 border rounded"
           onBlur={() => handleBlur("email")}
@@ -61,9 +67,12 @@ export default function FormComponent() {
         )}
       </div>
       <div>
-        <label className="block text-sm font-medium">Name</label>
+        <label htmlFor="name" className="block text-sm font-medium">
+          Name
+        </label>
         <input
           {...register("name")}
+          id="name"
           type="text"
           className="w-full p-2 border rounded"
           onBlur={() => handleBlur("name")}
@@ -74,9 +83,12 @@ export default function FormComponent() {
         )}
       </div>
       <div>
-        <label className="block text-sm font-medium">Age</label>
+        <label htmlFor="age" className="block text-sm font-medium">
+          Age
+        </label>
         <input
           {...register("age", { valueAsNumber: true })}
+          id="age"
           type="number"
           className="w-full p-2 border rounded"
           onBlur={() => handleBlur("age")}
@@ -87,9 +99,12 @@ export default function FormComponent() {
         )}
       </div>
       <div>
-        <label className="block text-sm font-medium">Birthday</label>
+        <label htmlFor="birthday" className="block text-sm font-medium">
+          Birthday
+        </label>
         <input
           {...register("birthday", { valueAsDate: true })}
+          id="birthday"
           type="date"
           className="w-full p-2 border rounded"
           onBlur={() => handleBlur("birthday")}
@@ -100,9 +115,12 @@ export default function FormComponent() {
         )}
       </div>
       <div>
-        <label className="block text-sm font-medium">Gender</label>
+        <label htmlFor="gender" className="block text-sm font-medium">
+          Gender
+        </label>
         <select
           {...register("gender")}
+          id="gender"
           className="w-full p-2 border rounded"
           onBlur={() => handleBlur("gender")}
           required
@@ -116,9 +134,12 @@ export default function FormComponent() {
         )}
       </div>
       <div>
-        <label className="block text-sm font-medium">Interests</label>
+        <label htmlFor="interests" className="block text-sm font-medium">
+          Interests
+        </label>
         <textarea
           {...register("interests")}
+          id="interests"
           className="w-full p-2 border rounded"
           onBlur={() => handleBlur("interests")}
         />

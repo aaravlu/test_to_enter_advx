@@ -20,6 +20,34 @@ You can start editing the page by modifying `app/page.tsx`. The page auto-update
 
 This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 
+## Testing
+
+This project uses Vitest with React Testing Library for comprehensive testing.
+
+### Running Tests
+
+```bash
+# Run tests in watch mode
+pnpm test
+
+# Run tests once
+pnpm test:run
+
+# Run tests with UI
+pnpm test:ui
+```
+
+### Test Coverage
+
+The test suite covers:
+- Form field rendering and validation
+- User interactions and form submission
+- Error handling for API calls
+- Zod schema validation
+- Auto-submit behavior on field blur
+
+See [TESTING.md](./TESTING.md) for detailed testing documentation.
+
 ## Learn More
 
 To learn more about Next.js, take a look at the following resources:
