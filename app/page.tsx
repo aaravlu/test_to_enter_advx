@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
-import FormComponent from "@/components/advx_form";
+import ADVXForm from "@/components/advx_form";
 import { FaList } from "react-icons/fa";
 
 export default function Home() {
@@ -35,9 +35,8 @@ export default function Home() {
         </div>
       </header>
 
-      {/* Main content */}
       <main className="max-w-md mx-auto py-8 px-4 sm:px-6 lg:px-8">
-        <FormComponent />
+        <ADVXForm />
       </main>
     </div>
   );

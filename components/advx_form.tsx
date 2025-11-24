@@ -11,7 +11,7 @@ import {
 } from "react-icons/fa";
 import { FaCalendarDays } from "react-icons/fa6";
 
-export default function FormComponent() {
+export default function ADVXForm() {
   const {
     register,
     trigger,
