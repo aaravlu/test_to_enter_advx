@@ -2,6 +2,8 @@ import fs from "fs/promises";
 import path from "path";
 import { AdvxData } from "../../types/advx";
 
+export const dynamic = "force-dynamic";
+
 export default async function AllSubmittedData() {
   const dataDir = path.join(process.cwd(), "data");
   const files = await fs.readdir(dataDir);
