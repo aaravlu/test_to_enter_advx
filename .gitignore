@@ -46,6 +46,6 @@ pnpm-lock.yaml
 # prompts
 prompt_*
 
-# tmp
-tmp/*
-!tmp/.gitkeep
+# local data
+data/*
+!data/.gitkeep

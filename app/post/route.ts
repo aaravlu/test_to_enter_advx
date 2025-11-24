@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
-import { dataStore } from "@/lib/data_store";
-import { AdvxData } from "@/types/advx";
+import fs from "fs/promises";
+import path from "path";
 
 export async function POST(request: Request) {
   try {
@@ -14,13 +14,23 @@ export async function POST(request: Request) {
       );
     }
 
-    const existingData = dataStore.get(github_id) || {};
+    const filePath = path.join(process.cwd(), "data", `${github_id}.json`);
+
+    let existingData = {};
+    try {
+      const fileContent = await fs.readFile(filePath, "utf-8");
+      existingData = JSON.parse(fileContent);
+    } catch (error) {
+      console.error("Error reading existing file:", error);
+    }
+
     const mergedData = { ...existingData, github_id, ...fields };
 
-    dataStore.set(github_id, mergedData as AdvxData);
+    await fs.writeFile(filePath, JSON.stringify(mergedData, null, 2));
 
     return NextResponse.json({ success: true });
-  } catch {
+  } catch (error) {
+    console.error(error);
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 },
