@@ -17,7 +17,7 @@ export const ADVX_DATA_DEFAULT: AdvxData = {
   github_id: "",
   email: "",
   name: "",
-  age: 0,
+  age: 1,
   birthday: new Date(NaN),
   gender: "other",
   interests: null,
