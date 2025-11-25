@@ -1,20 +1,20 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import FormComponent from "./advx_form";
+import ADVXForm from "./advx_form";
 
 // Mock fetch globally
 const mockFetch = vi.fn();
 global.fetch = mockFetch;
 
-describe("FormComponent", () => {
+describe("ADVXForm", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mockFetch.mockReset();
   });
 
   it("renders all form fields correctly", () => {
-    render(<FormComponent />);
+    render(<ADVXForm />);
 
     expect(screen.getByLabelText(/GitHub ID/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/Email/i)).toBeInTheDocument();
@@ -28,7 +28,7 @@ describe("FormComponent", () => {
 
   it("shows validation errors for required fields", async () => {
     const user = userEvent.setup();
-    render(<FormComponent />);
+    render(<ADVXForm />);
 
     // Get all required fields
     const githubInput = screen.getByLabelText(/GitHub ID/i);
@@ -66,7 +66,7 @@ describe("FormComponent", () => {
 
   it("validates email format correctly", async () => {
     const user = userEvent.setup();
-    render(<FormComponent />);
+    render(<ADVXForm />);
 
     const emailInput = screen.getByLabelText(/Email/i);
 
@@ -92,7 +92,7 @@ describe("FormComponent", () => {
 
   it("validates age as positive integer", async () => {
     const user = userEvent.setup();
-    render(<FormComponent />);
+    render(<ADVXForm />);
 
     const ageInput = screen.getByLabelText(/Age/i);
 
@@ -140,7 +140,7 @@ describe("FormComponent", () => {
       json: async () => ({ success: true }),
     });
 
-    render(<FormComponent />);
+    render(<ADVXForm />);
 
     // Fill required fields first
     await user.type(screen.getByLabelText(/GitHub ID/i), "testuser");
@@ -172,7 +172,7 @@ describe("FormComponent", () => {
       json: async () => ({ success: true }),
     });
 
-    render(<FormComponent />);
+    render(<ADVXForm />);
 
     const githubInput = screen.getByLabelText(/GitHub ID/i);
     await user.type(githubInput, "testuser");
@@ -188,7 +188,7 @@ describe("FormComponent", () => {
     const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {});
     mockFetch.mockRejectedValueOnce(new Error("Network error"));
 
-    render(<FormComponent />);
+    render(<ADVXForm />);
 
     // Fill required fields first
     await user.type(screen.getByLabelText(/GitHub ID/i), "testuser");
@@ -210,7 +210,7 @@ describe("FormComponent", () => {
 
   it("handles gender selection correctly", async () => {
     const user = userEvent.setup();
-    render(<FormComponent />);
+    render(<ADVXForm />);
 
     const genderSelect = screen.getByLabelText(/Gender/i);
 
@@ -228,7 +228,7 @@ describe("FormComponent", () => {
 
   it("handles optional interests field", async () => {
     const user = userEvent.setup();
-    render(<FormComponent />);
+    render(<ADVXForm />);
 
     const interestsTextarea = screen.getByLabelText(/Interests/i);
 
@@ -249,7 +249,7 @@ describe("FormComponent", () => {
 
   it("handles date input correctly", async () => {
     const user = userEvent.setup();
-    render(<FormComponent />);
+    render(<ADVXForm />);
 
     const birthdayInput = screen.getByLabelText(/Birthday/i);
 
