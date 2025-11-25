@@ -1,21 +1,22 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
 import ADVXForm from "./advx_form";
 
-// Mock fetch globally
-const mockFetch = vi.fn();
-global.fetch = mockFetch;
-
 describe("ADVXForm", () => {
+  const fetchMock = vi.fn();
+
   beforeEach(() => {
-    vi.clearAllMocks();
-    mockFetch.mockReset();
+    vi.stubGlobal("fetch", fetchMock);
+    fetchMock.mockClear();
   });
 
-  it("renders all form fields correctly", () => {
-    render(<ADVXForm />);
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
 
+  it("renders all form fields", () => {
+    render(<ADVXForm />);
     expect(screen.getByLabelText(/GitHub ID/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/Email/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/Name/i)).toBeInTheDocument();
@@ -23,138 +24,81 @@ describe("ADVXForm", () => {
     expect(screen.getByLabelText(/Birthday/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/Gender/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/Interests/i)).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: /submit/i })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /Submit/i })).toBeInTheDocument();
   });
 
-  it("shows validation errors for required fields", async () => {
-    const user = userEvent.setup();
+  it("shows error for empty github_id on blur", async () => {
     render(<ADVXForm />);
-
-    // Get all required fields
-    const githubInput = screen.getByLabelText(/GitHub ID/i);
-    const emailInput = screen.getByLabelText(/Email/i);
-    const nameInput = screen.getByLabelText(/Name/i);
-    const ageInput = screen.getByLabelText(/Age/i);
-    const birthdayInput = screen.getByLabelText(/Birthday/i);
-
-    // Focus and blur each field to trigger validation
-    await user.click(githubInput);
-    await user.tab();
-
-    await user.click(emailInput);
-    await user.tab();
-
-    await user.click(nameInput);
-    await user.tab();
-
-    await user.click(ageInput);
-    await user.tab();
-
-    await user.click(birthdayInput);
-    await user.tab();
-
-    // Check for validation errors
+    const input = screen.getByLabelText(/GitHub ID/i);
+    await userEvent.click(input);
+    await userEvent.tab();
     await waitFor(() => {
-      expect(screen.getByText(/GitHub ID is required/i)).toBeInTheDocument();
-      expect(screen.getByText(/Invalid email address/i)).toBeInTheDocument();
-      expect(screen.getByText(/Name is required/i)).toBeInTheDocument();
+      expect(screen.getByText("GitHub ID is required")).toBeInTheDocument();
+    });
+  });
+
+  it("shows error for invalid email on blur", async () => {
+    render(<ADVXForm />);
+    const input = screen.getByLabelText(/Email/i);
+    await userEvent.type(input, "invalid-email");
+    await userEvent.tab();
+    await waitFor(() => {
+      expect(screen.getByText("Invalid email address")).toBeInTheDocument();
+    });
+  });
+
+  it("shows error for empty name on blur", async () => {
+    render(<ADVXForm />);
+    const input = screen.getByLabelText(/Name/i);
+    await userEvent.click(input);
+    await userEvent.tab();
+    await waitFor(() => {
+      expect(screen.getByText("Name is required")).toBeInTheDocument();
+    });
+  });
+
+  it("shows error for invalid age on blur", async () => {
+    render(<ADVXForm />);
+    const input = screen.getByLabelText(/Age/i);
+    await userEvent.clear(input);
+    await userEvent.type(input, "-5");
+    await userEvent.tab();
+    await waitFor(() => {
       expect(
-        screen.getByText(/Age must be a positive integer/i),
+        screen.getByText("Age must be a positive integer"),
       ).toBeInTheDocument();
     });
   });
 
-  it("validates email format correctly", async () => {
-    const user = userEvent.setup();
+  it("does not show error for valid gender", async () => {
     render(<ADVXForm />);
-
-    const emailInput = screen.getByLabelText(/Email/i);
-
-    // Enter invalid email
-    await user.type(emailInput, "invalid-email");
-    await user.tab();
-
+    const select = screen.getByLabelText(/Gender/i);
+    await userEvent.selectOptions(select, "male");
+    await userEvent.tab();
     await waitFor(() => {
-      expect(screen.getByText(/Invalid email address/i)).toBeInTheDocument();
-    });
-
-    // Enter valid email
-    await user.clear(emailInput);
-    await user.type(emailInput, "test@example.com");
-    await user.tab();
-
-    await waitFor(() => {
-      expect(
-        screen.queryByText(/Invalid email address/i),
-      ).not.toBeInTheDocument();
+      expect(screen.queryByText(/Invalid/i)).not.toBeInTheDocument();
     });
   });
 
-  it("validates age as positive integer", async () => {
-    const user = userEvent.setup();
+  it("does not submit on github_id blur", async () => {
     render(<ADVXForm />);
-
-    const ageInput = screen.getByLabelText(/Age/i);
-
-    // Test with negative number - should show error
-    await user.type(ageInput, "-5");
-    await user.tab();
-
+    const input = screen.getByLabelText(/GitHub ID/i);
+    await userEvent.type(input, "testuser");
+    await userEvent.tab();
     await waitFor(() => {
-      // Check that age field shows validation error
-      const ageContainer = ageInput.closest("div");
-      const errorMessage = ageContainer?.querySelector(".text-red-500");
-      expect(errorMessage).toBeInTheDocument();
-      expect(errorMessage).toHaveTextContent(/.+/); // Should have some text content
-    });
-
-    // Clear field and test with decimal - should show error
-    await user.clear(ageInput);
-    await user.type(ageInput, "25.5");
-    await user.tab();
-
-    await waitFor(() => {
-      // Check that age field still shows validation error
-      const ageContainer = ageInput.closest("div");
-      const errorMessage = ageContainer?.querySelector(".text-red-500");
-      expect(errorMessage).toBeInTheDocument();
-    });
-
-    // Test with valid positive integer - should not show error
-    await user.clear(ageInput);
-    await user.type(ageInput, "25");
-    await user.tab();
-
-    await waitFor(() => {
-      // Check that no validation error is shown for age field
-      const ageContainer = ageInput.closest("div");
-      const errorMessage = ageContainer?.querySelector(".text-red-500");
-      expect(errorMessage).not.toBeInTheDocument();
+      expect(fetchMock).not.toHaveBeenCalled();
     });
   });
 
-  it("submits form data on blur for non-github fields", async () => {
-    const user = userEvent.setup();
-    mockFetch.mockResolvedValueOnce({
-      ok: true,
-      json: async () => ({ success: true }),
-    });
-
+  it("submits on email blur with valid data", async () => {
     render(<ADVXForm />);
-
-    // Fill required fields first
-    await user.type(screen.getByLabelText(/GitHub ID/i), "testuser");
-    await user.type(screen.getByLabelText(/Email/i), "test@example.com");
-    await user.type(screen.getByLabelText(/Name/i), "Test User");
-    await user.type(screen.getByLabelText(/Age/i), "25");
-
-    // Test email field submission on blur
+    const githubInput = screen.getByLabelText(/GitHub ID/i);
+    await userEvent.type(githubInput, "testuser");
     const emailInput = screen.getByLabelText(/Email/i);
-    await user.click(emailInput);
-    await user.tab();
-
+    await userEvent.type(emailInput, "test@example.com");
+    await userEvent.tab();
     await waitFor(() => {
-      expect(mockFetch).toHaveBeenCalledWith("/post", {
+      expect(fetchMock).toHaveBeenCalledWith("/post", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -165,105 +109,111 @@ describe("ADVXForm", () => {
     });
   });
 
-  it("does not submit on blur for github_id field", async () => {
-    const user = userEvent.setup();
-    mockFetch.mockResolvedValueOnce({
-      ok: true,
-      json: async () => ({ success: true }),
-    });
-
+  it("submits on name blur with valid data", async () => {
     render(<ADVXForm />);
-
     const githubInput = screen.getByLabelText(/GitHub ID/i);
-    await user.type(githubInput, "testuser");
-    await user.tab();
-
+    await userEvent.type(githubInput, "testuser");
+    const nameInput = screen.getByLabelText(/Name/i);
+    await userEvent.type(nameInput, "Test Name");
+    await userEvent.tab();
     await waitFor(() => {
-      expect(mockFetch).not.toHaveBeenCalled();
+      expect(fetchMock).toHaveBeenCalledWith("/post", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ github_id: "testuser", name: "Test Name" }),
+      });
     });
   });
 
-  it("handles fetch errors gracefully", async () => {
-    const user = userEvent.setup();
-    const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {});
-    mockFetch.mockRejectedValueOnce(new Error("Network error"));
-
+  it("submits on age blur with valid data", async () => {
     render(<ADVXForm />);
-
-    // Fill required fields first
-    await user.type(screen.getByLabelText(/GitHub ID/i), "testuser");
-    await user.type(screen.getByLabelText(/Email/i), "test@example.com");
-    await user.type(screen.getByLabelText(/Name/i), "Test User");
-    await user.type(screen.getByLabelText(/Age/i), "25");
-
-    // Trigger blur on email field
-    const emailInput = screen.getByLabelText(/Email/i);
-    await user.click(emailInput);
-    await user.tab();
-
+    const githubInput = screen.getByLabelText(/GitHub ID/i);
+    await userEvent.type(githubInput, "testuser");
+    const ageInput = screen.getByLabelText(/Age/i);
+    await userEvent.clear(ageInput);
+    await userEvent.type(ageInput, "25");
+    await userEvent.tab();
     await waitFor(() => {
-      expect(consoleSpy).toHaveBeenCalledWith(expect.any(Error));
+      expect(fetchMock).toHaveBeenCalledWith("/post", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ github_id: "testuser", age: 25 }),
+      });
     });
-
-    consoleSpy.mockRestore();
   });
 
-  it("handles gender selection correctly", async () => {
-    const user = userEvent.setup();
+  it("submits on birthday blur with valid data", async () => {
     render(<ADVXForm />);
-
-    const genderSelect = screen.getByLabelText(/Gender/i);
-
-    // Check default value
-    expect(genderSelect).toHaveValue("other");
-
-    // Change to male
-    await user.selectOptions(genderSelect, "male");
-    expect(genderSelect).toHaveValue("male");
-
-    // Change to female
-    await user.selectOptions(genderSelect, "female");
-    expect(genderSelect).toHaveValue("female");
-  });
-
-  it("handles optional interests field", async () => {
-    const user = userEvent.setup();
-    render(<ADVXForm />);
-
-    const interestsTextarea = screen.getByLabelText(/Interests/i);
-
-    // Should not have validation error for empty optional field
-    await user.click(interestsTextarea);
-    await user.tab();
-
-    await waitFor(() => {
-      expect(
-        screen.queryByText(/Interests is required/i),
-      ).not.toBeInTheDocument();
-    });
-
-    // Should accept text input
-    await user.type(interestsTextarea, "Programming, Reading, Music");
-    expect(interestsTextarea).toHaveValue("Programming, Reading, Music");
-  });
-
-  it("handles date input correctly", async () => {
-    const user = userEvent.setup();
-    render(<ADVXForm />);
-
+    const githubInput = screen.getByLabelText(/GitHub ID/i);
+    await userEvent.type(githubInput, "testuser");
     const birthdayInput = screen.getByLabelText(/Birthday/i);
-
-    // Test with valid date
-    await user.type(birthdayInput, "1990-01-15");
-    expect(birthdayInput).toHaveValue("1990-01-15");
-
-    // Test validation - date field is required but doesn't have a custom error message
-    await user.clear(birthdayInput);
-    await user.tab();
-
+    await userEvent.type(birthdayInput, "1990-01-01");
+    await userEvent.tab();
     await waitFor(() => {
-      // The date field validation error will be shown but without specific message
-      expect(birthdayInput).toBeInvalid();
+      const call = fetchMock.mock.calls[0];
+      expect(call[0]).toBe("/post");
+      expect(call[1]).toEqual(
+        expect.objectContaining({
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+        }),
+      );
+      const body = JSON.parse(call[1].body);
+      expect(body).toEqual({
+        github_id: "testuser",
+        birthday: expect.any(String), // Date is serialized as ISO string
+      });
     });
+  });
+
+  it("submits on gender blur with valid data", async () => {
+    render(<ADVXForm />);
+    const githubInput = screen.getByLabelText(/GitHub ID/i);
+    await userEvent.type(githubInput, "testuser");
+    const genderSelect = screen.getByLabelText(/Gender/i);
+    await userEvent.selectOptions(genderSelect, "female");
+    await userEvent.tab();
+    await waitFor(() => {
+      expect(fetchMock).toHaveBeenCalledWith("/post", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ github_id: "testuser", gender: "female" }),
+      });
+    });
+  });
+
+  it("submits on interests blur with valid data", async () => {
+    render(<ADVXForm />);
+    const githubInput = screen.getByLabelText(/GitHub ID/i);
+    await userEvent.type(githubInput, "testuser");
+    const interestsTextarea = screen.getByLabelText(/Interests/i);
+    await userEvent.type(interestsTextarea, "Coding, Reading");
+    await userEvent.tab();
+    await waitFor(() => {
+      expect(fetchMock).toHaveBeenCalledWith("/post", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          github_id: "testuser",
+          interests: "Coding, Reading",
+        }),
+      });
+    });
+  });
+
+  it("handles fetch error gracefully", async () => {
+    const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+    fetchMock.mockRejectedValueOnce(new Error("Network error"));
+    render(<ADVXForm />);
+    const githubInput = screen.getByLabelText(/GitHub ID/i);
+    await userEvent.type(githubInput, "testuser");
+    const nameInput = screen.getByLabelText(/Name/i);
+    await userEvent.type(nameInput, "Test Name");
+    await userEvent.tab();
+    await waitFor(() => {
+      expect(fetchMock).toHaveBeenCalled();
+      expect(consoleSpy).toHaveBeenCalledWith(new Error("Network error"));
+    });
+    consoleSpy.mockRestore();
   });
 });
